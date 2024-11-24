@@ -8,9 +8,16 @@ import {
   View,
 } from "react-native";
 
+// Define the type for chat messages
+type ChatMessage = {
+  user: string;
+  text: string;
+  time?: number;
+};
+
 const WebSocketChat = () => {
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [allChat, setAllChat] = useState([]);
+  const [ws, setWs] = useState<WebSocket | null>(null); // Explicitly type ws
+  const [allChat, setAllChat] = useState<ChatMessage[]>([]); // Use ChatMessage type
   const [user, setUser] = useState("");
   const [message, setMessage] = useState("");
   const [presence, setPresence] = useState("🔴");
@@ -29,7 +36,7 @@ const WebSocketChat = () => {
     };
 
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const data: { msg: ChatMessage[] } = JSON.parse(event.data); // Parse as ChatMessage[]
       setAllChat(data.msg);
     };
 
@@ -42,7 +49,7 @@ const WebSocketChat = () => {
 
   const postNewMsg = () => {
     if (ws && user && message) {
-      const data = { user, text: message };
+      const data: ChatMessage = { user, text: message, time: Date.now() }; // Add time if needed
       ws.send(JSON.stringify(data));
       setMessage("");
     }
