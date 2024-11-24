@@ -1,5 +1,5 @@
 // backend/server.js
-import http from "http";
+import http from "node:http";
 import nanobuffer from "nanobuffer";
 import objToResponse from "./obj-to-response.js";
 import generateAcceptValue from "./generate-accept-value.js";
@@ -29,7 +29,7 @@ const server = http.createServer((request, response) => {
 });
 
 // Handle WebSocket upgrades
-server.on("upgrade", function (req, socket) {
+server.on("upgrade", (req, socket) => {
   if (req.headers["upgrade"] !== "websocket") {
     // Only handle WebSocket requests
     socket.end("HTTP/1.1 400 Bad Request");

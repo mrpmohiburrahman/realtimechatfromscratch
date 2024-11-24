@@ -1,5 +1,5 @@
 // backend/generate-accept-value.js
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 function generateAcceptValue(acceptKey) {
   return (
