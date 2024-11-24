@@ -1,4 +1,4 @@
-// backend/server.js
+// src/server.js
 import http from "node:http";
 import nanobuffer from "nanobuffer";
 import objToResponse from "./obj-to-response.js";

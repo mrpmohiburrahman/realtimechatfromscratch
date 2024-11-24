@@ -1,4 +1,4 @@
-// backend/parse-message.js
+// src/parse-message.js
 function parseMessage(buffer) {
   const firstByte = buffer.readUInt8(0);
   const opCode = firstByte & 0xf;

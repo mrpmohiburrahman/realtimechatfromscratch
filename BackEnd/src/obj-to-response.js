@@ -1,4 +1,4 @@
-// backend/obj-to-response.js
+// src/obj-to-response.js
 export default function objToResponse(obj) {
   const string = JSON.stringify(obj);
   const stringBytes = Buffer.byteLength(string);
