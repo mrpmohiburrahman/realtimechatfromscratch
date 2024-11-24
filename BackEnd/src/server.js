@@ -1,43 +1,26 @@
 // src/server.js
 import http from "node:http";
 import nanobuffer from "nanobuffer";
-import objToResponse from "./obj-to-response.js";
-import generateAcceptValue from "./generate-accept-value.js";
-import parseMessage from "./parse-message.js";
+import parseMessage from "./utils/parse-message.js";
+import { handleHttpRequest } from "./handlers/handleHttpRequest.js";
+import computeWebSocketAcceptValue from "./utils/compute-web-socket-accept-value.js";
+import objToResponse from "./utils/objToResponse.js";
 
 let connections = [];
 const msg = new nanobuffer(50);
 const getMsgs = () => Array.from(msg).reverse();
 
-// Initial message for demonstration
-msg.push({
-  user: "brian",
-  text: "hi",
-  time: Date.now(),
-});
-
-// Create HTTP server without serving static files
-const server = http.createServer((request, response) => {
-  // Optionally, handle HTTP requests here (e.g., health checks)
-  if (request.method === "GET" && request.url === "/health") {
-    response.writeHead(200, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({ status: "OK" }));
-  } else {
-    response.writeHead(404, { "Content-Type": "text/plain" });
-    response.end("Not Found");
-  }
-});
+const server = http.createServer(handleHttpRequest);
 
 // Handle WebSocket upgrades
 server.on("upgrade", (req, socket) => {
   if (req.headers["upgrade"] !== "websocket") {
-    // Only handle WebSocket requests
     socket.end("HTTP/1.1 400 Bad Request");
     return;
   }
 
   const acceptKey = req.headers["sec-websocket-key"];
-  const acceptValue = generateAcceptValue(acceptKey);
+  const acceptValue = computeWebSocketAcceptValue(acceptKey);
   const headers = [
     "HTTP/1.1 101 Switching Protocols",
     "Upgrade: websocket",
