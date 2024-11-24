@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
 } from "react-native";
 
 // Define the type for chat messages
@@ -58,41 +59,43 @@ const WebSocketChat = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Chat App</Text>
-      <View style={styles.chatContainer}>
-        <FlatList
-          data={allChat}
-          keyExtractor={(item, index) => `${item.user}-${index}`}
-          renderItem={({ item }) => (
-            <View style={styles.messageContainer}>
-              <Text style={styles.user}>{item.user}</Text>
-              <Text style={styles.message}>{item.text}</Text>
-            </View>
-          )}
-        />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Chat App</Text>
+        <View style={styles.chatContainer}>
+          <FlatList
+            data={allChat}
+            keyExtractor={(item, index) => `${item.user}-${index}`}
+            renderItem={({ item }) => (
+              <View style={styles.messageContainer}>
+                <Text style={styles.user}>{item.user}</Text>
+                <Text style={styles.message}>{item.text}</Text>
+              </View>
+            )}
+          />
+        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.inputContainer}
+        >
+          <TextInput
+            placeholder="Your Name"
+            value={user}
+            onChangeText={setUser}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Type a message..."
+            value={message}
+            onChangeText={setMessage}
+            style={styles.input}
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={postNewMsg}>
+            <Text style={styles.sendButtonText}>Send</Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.inputContainer}
-      >
-        <TextInput
-          placeholder="Your Name"
-          value={user}
-          onChangeText={setUser}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Type a message..."
-          value={message}
-          onChangeText={setMessage}
-          style={styles.input}
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={postNewMsg}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -140,6 +143,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#E0E0E0",
     backgroundColor: "#FFFFFF",
+    marginBottom: Platform.select({ ios: 80 }),
   },
   input: {
     height: 44,
