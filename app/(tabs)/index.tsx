@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 const WebSocketChat = () => {
-  const [ws, setWs] = useState(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
   const [allChat, setAllChat] = useState([]);
   const [user, setUser] = useState("");
   const [message, setMessage] = useState("");
