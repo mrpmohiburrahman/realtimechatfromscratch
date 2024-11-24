@@ -3,9 +3,11 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  Button,
   FlatList,
   View,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 // Define the type for chat messages
@@ -16,8 +18,8 @@ type ChatMessage = {
 };
 
 const WebSocketChat = () => {
-  const [ws, setWs] = useState<WebSocket | null>(null); // Explicitly type ws
-  const [allChat, setAllChat] = useState<ChatMessage[]>([]); // Use ChatMessage type
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [allChat, setAllChat] = useState<ChatMessage[]>([]);
   const [user, setUser] = useState("");
   const [message, setMessage] = useState("");
   const [presence, setPresence] = useState("🔴");
@@ -36,7 +38,7 @@ const WebSocketChat = () => {
     };
 
     socket.onmessage = (event) => {
-      const data: { msg: ChatMessage[] } = JSON.parse(event.data); // Parse as ChatMessage[]
+      const data: { msg: ChatMessage[] } = JSON.parse(event.data);
       setAllChat(data.msg);
     };
 
@@ -49,7 +51,7 @@ const WebSocketChat = () => {
 
   const postNewMsg = () => {
     if (ws && user && message) {
-      const data: ChatMessage = { user, text: message, time: Date.now() }; // Add time if needed
+      const data: ChatMessage = { user, text: message, time: Date.now() };
       ws.send(JSON.stringify(data));
       setMessage("");
     }
@@ -57,31 +59,39 @@ const WebSocketChat = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.presenceIndicator}>{presence}</Text>
-      <Text style={styles.title}>Chat with Me</Text>
-      <FlatList
-        data={allChat}
-        keyExtractor={(item, index) => `${item.user}-${index}`}
-        renderItem={({ item }) => (
-          <Text style={styles.message}>
-            <Text style={styles.user}>{item.user}: </Text>
-            {item.text}
-          </Text>
-        )}
-      />
-      <TextInput
-        placeholder="User Name"
-        value={user}
-        onChangeText={setUser}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Message"
-        value={message}
-        onChangeText={setMessage}
-        style={styles.input}
-      />
-      <Button title="Send" onPress={postNewMsg} />
+      <Text style={styles.title}>Chat App</Text>
+      <View style={styles.chatContainer}>
+        <FlatList
+          data={allChat}
+          keyExtractor={(item, index) => `${item.user}-${index}`}
+          renderItem={({ item }) => (
+            <View style={styles.messageContainer}>
+              <Text style={styles.user}>{item.user}</Text>
+              <Text style={styles.message}>{item.text}</Text>
+            </View>
+          )}
+        />
+      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.inputContainer}
+      >
+        <TextInput
+          placeholder="Your Name"
+          value={user}
+          onChangeText={setUser}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Type a message..."
+          value={message}
+          onChangeText={setMessage}
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={postNewMsg}>
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -89,32 +99,68 @@ const WebSocketChat = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  presenceIndicator: {
-    fontSize: 24,
-    marginBottom: 10,
+    backgroundColor: "#F5F5F5",
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: "600",
+    padding: 16,
+    backgroundColor: "#6200EE",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
-  message: {
-    fontSize: 18,
-    paddingVertical: 5,
+  chatContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  messageContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 4,
+    alignSelf: "flex-start",
+    maxWidth: "80%",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
   },
   user: {
-    fontWeight: "bold",
+    fontWeight: "600",
+    marginBottom: 4,
+    color: "#6200EE",
+  },
+  message: {
+    fontSize: 16,
+    color: "#333333",
+  },
+  inputContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+    backgroundColor: "#FFFFFF",
   },
   input: {
-    height: 40,
-    borderColor: "gray",
+    height: 44,
+    borderColor: "#E0E0E0",
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    backgroundColor: "#FAFAFA",
+  },
+  sendButton: {
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#6200EE",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sendButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 
