@@ -1,20 +1,17 @@
-// src/parse-message.js
 function parseMessage(buffer) {
   const firstByte = buffer.readUInt8(0);
   const opCode = firstByte & 0xf;
 
   if (opCode === 8) {
-    // connection closed
     return null;
   }
   if (opCode !== 1) {
-    // we only care about text frames
     return;
   }
 
   const secondByte = buffer.readUInt8(1);
   const isMasked = secondByte >>> 7 === 1;
-  // we should only be seeing masked frames from the browser
+
   if (!isMasked) {
     throw new Error("we only care about masked frames from the browser");
   }
@@ -27,11 +24,8 @@ function parseMessage(buffer) {
     throw new Error("lol we're not doing big frames");
   }
 
-  // getting all of the bytes together for the string
-  // then we'll convert it to a utf8 string
   const response = Buffer.alloc(messageLength);
   for (let i = 0; i < messageLength; i++) {
-    // applying the mask to get the correct byte out
     const maskPosition = i % 4;
 
     let shift;

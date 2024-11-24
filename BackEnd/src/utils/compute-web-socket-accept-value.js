@@ -1,4 +1,3 @@
-// utils/computeWebSocketAccept.js
 import crypto from "node:crypto";
 
 export default function computeWebSocketAcceptValue(key) {
